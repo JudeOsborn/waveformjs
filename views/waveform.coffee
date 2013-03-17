@@ -7,12 +7,13 @@ window.Waveform = class Waveform
     @innerColor = options.innerColor || "#000000"
     @interpolate = true
     @interpolate = false if options.interpolate == false
+    @fullHeight = true
+    @fullHeight = false if options.fullHeight == false
     unless @canvas?
       if @container
         @canvas = @createCanvas(@container, options.width || @container.clientWidth, options.height || @container.clientHeight)
       else
         throw "Either canvas or container option must be passed"
-
     @patchCanvasForIE(@canvas)
     @context = @canvas.getContext("2d")
     @width  = parseInt @context.canvas.width, 10
@@ -42,13 +43,17 @@ window.Waveform = class Waveform
   redraw: () =>
     @clear()
     @context.fillStyle = @innerColor
-    middle = @height / 2
     i = 0
+    if @fullHeight
+      size = 2
+    else
+      size = 1
+    middle = @height / size
     for d in @data
       t = @width / @data.length
       @context.fillStyle = @innerColor(i/@width, d) if typeof(@innerColor) == "function"
-      @context.clearRect t*i, middle - middle * d, t, (middle * d * 2)
-      @context.fillRect t*i, middle - middle * d, t, middle * d * 2
+      @context.clearRect t*i, middle - middle * d, t, (middle * d * size)
+      @context.fillRect t*i, middle - middle * d, t, middle * d * size
       i++
 
   clear: ->
